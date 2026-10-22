@@ -36,6 +36,7 @@ class Config:
     issue_pages: int = 5                  # 100 issues per page
     local_checkout: str | None = None     # optional local clone used when the git tree API fails
     disk_cache: bool = True               # GSB_DISK_CACHE=0 keeps the whole snapshot in memory only
+    allow_private: bool = False           # GSB_ALLOW_PRIVATE=1 for loopback/local-only export
 
     @classmethod
     def from_env(cls, **overrides) -> "Config":
@@ -53,6 +54,7 @@ class Config:
             artifact_max_bytes=_int("GSB_ARTIFACT_MAX_MB", 80) * 1024 * 1024,
             local_checkout=os.environ.get("GSB_LOCAL_CHECKOUT") or None,
             disk_cache=os.environ.get("GSB_DISK_CACHE", "1").strip().lower() not in ("0", "false", "no", "off"),
+            allow_private=os.environ.get("GSB_ALLOW_PRIVATE", "0").strip().lower() in ("1", "true", "yes", "on"),
         )
         names = os.environ.get("GSB_TEST_ARTIFACTS")
         if names:

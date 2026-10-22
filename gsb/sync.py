@@ -375,7 +375,7 @@ class Sync:
     def collect(self, changed_runs=()):
         self.changed_jobs = []
         self.meta = self.gh.get(self.base)
-        if self.meta.get("private") or self.meta.get("visibility", "public") != "public":
+        if (self.meta.get("private") or self.meta.get("visibility", "public") != "public") and not self.cfg.allow_private:
             raise ValueError("public dashboard requires a public source")
         self.guarded("reruns", lambda: self.refresh_changed_runs(changed_runs))
         self.guarded("rerun_details", lambda: self.pending(count=20, priority={"run:" + key for _, key in self.changed_jobs}, only_priority=True))

@@ -146,6 +146,10 @@ def main():
     try:
         settings = json.loads(Path(args.settings).read_text())
         deployment = deployment_for(args.repo, settings, args.publish_repo)
+        if args.publish_repo and os.environ.get("GSB_ALLOW_PRIVATE", "").strip().lower() in ("1", "true", "yes", "on"):
+            source_meta = gh.get(f"/repos/{args.repo}")
+            if source_meta.get("private") or source_meta.get("visibility", "public") != "public":
+                raise ValueError("private source cannot be published to public Pages; use the local server")
         sync = records = None
         if args.incremental:
             from gsb.sync import Sync

@@ -150,10 +150,10 @@ def build_project(gh, repo, settings=None):
         raise ValueError("expected owner/repository")
     settings = settings or {}
     meta = gh.get(f"/repos/{repo}")
-    if meta.get("private") or meta.get("visibility", "public") != "public":
+    cfg = Config.from_env(repo=repo, review_sla_days=int(settings.get("review_sla_days", 3)),
+                          stale_days=int(settings.get("stale_days", 30)))
+    if (meta.get("private") or meta.get("visibility", "public") != "public") and not cfg.allow_private:
         raise ValueError("public dashboard export only accepts public source repositories")
-    cfg = Config(repo=repo, review_sla_days=int(settings.get("review_sla_days", 3)),
-                 stale_days=int(settings.get("stale_days", 30)))
     now = datetime.now(timezone.utc)
     context = Context(gh, cfg, now, meta)
     doc = {"schema_version": 1, "generated_at": now.isoformat(), "repository": {
