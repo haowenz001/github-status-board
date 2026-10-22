@@ -1,0 +1,64 @@
+name: CI
+
+# Keep this workflow name as CI. The status board classifies CI runs as the
+# gate layer by default (board-config.json workflows.gate starts with ^CI$).
+on:
+  pull_request:
+  merge_group:
+  push:
+    branches: [main]
+  schedule:
+    - cron: '23 1 * * *'
+  release:
+    types: [published]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  gate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install dependencies
+        if: hashFiles('package-lock.json') != ''
+        run: npm ci
+      - name: Run gate
+        env:
+          # On pull_request, GITHUB_SHA is the merge commit. Report the PR head
+          # so the dashboard can associate the run with the actual change.
+          CI_GATES_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+          CI_GATES_CLI: ${{ github.workspace }}/scripts/gate/gate.mjs
+        run: node scripts/gate/gate.mjs run --event "${{ github.event_name }}" --out gate-reports
+      - name: Upload gate reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ci-gates-reports
+          path: gate-reports
+          if-no-files-found: ignore
+      # Optional: the status board reads JUnit/Playwright reports from an
+      # artifact named ut-results. Adjust the globs to your test runner, or
+      # delete this step if you do not publish test reports yet.
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ut-results
+          path: |
+            **/junit*.xml
+            **/test-results/**/*.xml
+            **/test-results/**/results.json
+            **/playwright-report/results.json
+          if-no-files-found: ignore

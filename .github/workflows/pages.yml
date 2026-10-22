@@ -4,6 +4,9 @@ on:
     branches: [main]
     paths:
       - 'site/**'
+  workflow_run:
+    workflows: ["Collect dashboard data (PAT)"]
+    types: [completed]
   workflow_dispatch:
 
 permissions:
@@ -15,6 +18,7 @@ concurrency:
 
 jobs:
   deploy:
+    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:
@@ -27,6 +31,8 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - uses: actions/checkout@v6
+        with:
+          ref: main
       - name: Validate static snapshot
         run: |
           test -s site/index.html

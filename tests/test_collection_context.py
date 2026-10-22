@@ -19,18 +19,9 @@ class CollectionContextTests(unittest.TestCase):
         self.assertEqual(result["target"], self.target)
         self.assertEqual(result["source_owner"], self.source.split("/")[0])
         self.assertEqual(result["target_name"], self.target.split("/")[1])
-        expected = {
-            "production": ("openJiuwen-ai/sciencediscovery", "ScienceDiscovery/github-status-board"),
-            "test": ("ScienceDiscovery/sciencediscovery", "ScienceDiscovery/github-status-board-test"),
-        }
-        self.assertEqual((self.source, self.target), expected[self.deployment["environment"]])
 
     def test_cross_site_and_unknown_repository_are_rejected(self):
-        other_source, other_target = (
-            ("ScienceDiscovery/sciencediscovery", "ScienceDiscovery/github-status-board-test")
-            if self.deployment["environment"] == "production"
-            else ("openJiuwen-ai/sciencediscovery", "ScienceDiscovery/github-status-board")
-        )
+        other_source, other_target = "example/other-source", "example/other-dashboard"
         for destination, source in [(self.target, other_source), (other_target, ""), ("evil/dashboard", "")]:
             with self.subTest(destination=destination, source=source), self.assertRaises(ValueError):
                 collection_context(destination, source)

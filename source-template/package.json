@@ -1,0 +1,10 @@
+{
+  "name": "ci-gates-source-template",
+  "private": true,
+  "version": "0.0.0",
+  "scripts": {
+    "build": "node -e \"console.log('replace with your build command')\"",
+    "lint": "node -e \"console.log('replace with your lint command')\"",
+    "test": "node --test"
+  }
+}

@@ -1,5 +1,36 @@
 # GitHub 项目状态看板
 
+> **本仓是私仓/单仓看板模板。** 上游 `ScienceDiscovery/github-status-board` 的
+> OIDC/Bot 采集流程已移到 `docs/upstream-workflows/`，模板使用
+> `setup.yml` + `collect-selfhosted.yml`，只需要源仓链接和一份 JSON 配置。
+
+## 模板快速开始
+
+1. 用本仓创建一个新的看板仓（建议 public，Pages 需要）。
+2. 在 **Settings → Pages → Build and deployment** 选择 **GitHub Actions**。
+3. 在 **Actions → Setup dashboard → Run workflow** 填写：
+   - `source_repository`：要展示的代码仓，例如 `owner/service`；
+   - `config_json`（可选）：
+     ```json
+     {
+       "label": "service",
+       "workflows": { "gate": ["^CI$", "CI Gates"], "daily": ["nightly"], "release": ["release"] },
+       "branch_lines": [{ "key": "main", "ref": "main" }],
+       "review_sla_days": 3,
+       "stale_days": 30
+     }
+     ```
+   - `reset`：切换源仓时勾选，清掉旧采集数据。
+4. 源仓按 [`source-template/`](source-template/README.md) 复制门禁工作流、`.github/ci-gates.json`、`scripts/gate/gate.mjs` 和用例目录，改成自己的 build/lint/test 命令。
+5. Setup 会写入 `board-config.json` 并触发 `Collect dashboard data (PAT)`；采集完成后 `Deploy dashboard Pages` 自动发布。
+
+源仓是公开仓时，采集使用本仓 `GITHUB_TOKEN` 即可。源仓是私有仓时，在本仓 **Settings → Secrets and variables → Actions** 添加 `SOURCE_TOKEN`（fine-grained PAT，至少 `Contents: read`、`Actions: read`、`Issues: read`、`Pull requests: read`、`Metadata: read`）。注意：公开 Pages 会展示源仓数据，私有源仓不要直接发布到公开 Pages；私有场景请用本机 `publish.py` + `server.py`，或私有 Pages/内网部署。
+
+`board-config.json` 仍然兼容上游配置格式；`docs/` 里的上游文档保留作参考。
+
+## 上游说明
+
+
 静态 GitHub Pages 看板，展示 Issue、PR、门禁、每日构建、版本验证、UT / ST / E2E、标签化测试及 Node.js / Python 覆盖率（可展开到文件）。总览优先列出需要处理的流水线问题；Issue 与 PR 可在表格和本地看板之间切换；CI、E2E 与 Coverage 可在 main 和长期开发分支之间切换查看。采集由看板仓 GitHub Actions 执行；Bot 负责接收 Webhook 和触发刷新。
 
 | 用途 | 数据源 | 站点 |
@@ -9,12 +40,12 @@
 
 ## 使用
 
-在目标仓 Actions 手动运行 **Collect dashboard data**，或由 Bot 触发：Issue、PR 新建、重新打开或关闭时立即触发，其余变化每 8 小时随定时刷新一次；看板仓自己每天 UTC 02:17 定时运行一次，作为 Bot 停止触发时的兜底。`main` 上包含 `site/`、`.sync/` 以外文件改动的推送，也会自动派发一次采集；仅改这两个目录的采集提交不会再次派发。采集提交 `site/` 后，**Deploy dashboard Pages** 发布站点。首次配置见 [Actions 采集](docs/actions-collection.md)。
+配置完成后，在 **Actions → Collect dashboard data (PAT) → Run workflow** 手动跑一次；之后每天 UTC 02:17 自动运行。采集提交 `site/` 后，`Deploy dashboard Pages` 通过 `workflow_run` 自动发布。上游的 `collect.yml` / `collect-on-push.yml` 已移到 `docs/upstream-workflows/`，模板不需要 OIDC Bot。
 
 本地快速预览（Python 3.10+，凭据来自环境或已登录的 gh）：
 
 ```bash
-python3 publish.py --repo openJiuwen-ai/sciencediscovery
+python3 publish.py --repo owner/service
 python3 server.py
 ```
 
