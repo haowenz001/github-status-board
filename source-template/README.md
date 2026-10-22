@@ -17,6 +17,7 @@ Then:
 2. Fill `test/cases/case-catalog.yaml`. A `ready` case needs `file`, `owner` and a `// @case <id>` marker in the file. Mark unfinished cases `todo`; use `skipped` with `until` and `reason` only when necessary.
 3. Open a PR. The `CI` workflow runs `build` and `pr-ready`; on merge queue it runs `pr-merge`; on main push it runs `build`; on schedule it runs `daily` (observe only); on release it runs `release`.
 4. Enable branch protection and require the check **`CI / gate`**. Use `CI / gate` in the merge queue too.
+5. To see this repo on a dashboard, fork/open <https://github.com/haowenz001/github-status-board>, run **Setup dashboard** with this repo and the JSON from root `README.md`; the `CI` workflow's `ci-gates-reports` powers the 质量门禁 card.
 
 The workflow uploads:
 
