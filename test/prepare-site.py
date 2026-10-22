@@ -163,7 +163,7 @@ lane_runs.append(lane_run(399,'CI','workflow_call','2026-09-19T18:00:05Z','main'
 lane_runs.append(lane_run(398,'Maintenance','push','2026-09-19T18:00:06Z','main'))
 lane_runs.append(lane_run(397,'CI','merge_group','2026-09-20T05:00:00Z','gh-readonly-queue/main/pr-3'))
 lane_runs.append(lane_run(396,'CI',None,'2026-09-20T05:01:00Z','main'))
-lanes=build_lanes(lane_runs,default_branch='main',now=datetime(2026,9,20,12,tzinfo=timezone.utc),rules=json.loads((root/'board-config.json').read_text())['workflows'],prs=[pr])
+lanes=build_lanes(lane_runs,default_branch='main',now=datetime(2026,9,20,12,tzinfo=timezone.utc),rules=json.loads((root/'test/fixtures/board-config.json').read_text())['workflows'],prs=[pr])
 ci['lanes']=lanes
 # E2E histories also use these run IDs to identify their branch line.
 ci['recent_runs']=[*runs,*lane_runs]
@@ -179,7 +179,7 @@ swarm_ci=dict(default_branch='releases/v0.3.0.beta',main=swarm_rate,pull_request
               main_timeline=[swarm_recent[2]],latest_main=dict(run=swarm_recent[2],jobs=[dict(name='UT',conclusion='failure',url=base+'/actions/runs/602',duration_s=300,failed_steps=['Run unit tests'])]),
               workflows=[dict(name='CI',url=base+'/actions/workflows/ci.yml',path='.github/workflows/ci.yml',state='active',all=swarm_rate,main=swarm_rate,pull_request=swarm_rate,failures_7d=2,last_run=swarm_recent[2])],
               job_health=[],recent_runs=swarm_recent,
-              lanes=build_lanes(swarm_runs,default_branch='releases/v0.3.0.beta',now=datetime(2026,9,20,12,tzinfo=timezone.utc),rules=json.loads((root/'board-config.json').read_text())['workflows'],prs=[pr],lanes=tuple((key,'releases/v0.3.0.beta' if key=='main' else label) for key,label in LANES)))
+              lanes=build_lanes(swarm_runs,default_branch='releases/v0.3.0.beta',now=datetime(2026,9,20,12,tzinfo=timezone.utc),rules=json.loads((root/'test/fixtures/board-config.json').read_text())['workflows'],prs=[pr],lanes=tuple((key,'releases/v0.3.0.beta' if key=='main' else label) for key,label in LANES)))
 # Its summaries predate per-file totals: groups only, the newest one from a later commit.
 swarm_cov=json.loads(json.dumps(tests['coverage']))
 for dataset in swarm_cov['languages'].values():
@@ -197,12 +197,12 @@ legacy_ci=dict(default_branch='legacy',main=legacy_rate,pull_request=dict(legacy
                                all=legacy_rate,main=legacy_rate,pull_request=legacy_rate,failures_7d=0,last_run=legacy_recent)],
                job_health=[],recent_runs=[legacy_recent],
                lanes=build_lanes([legacy_run,lane_run(611,'Nightly','schedule','2026-09-19T18:00:00Z','legacy')],default_branch='legacy',now=datetime(2026,9,20,12,tzinfo=timezone.utc),
-                                 rules=json.loads((root/'board-config.json').read_text())['workflows'],lanes=tuple((key,'legacy' if key=='main' else label) for key,label in LANES)))
+                                 rules=json.loads((root/'test/fixtures/board-config.json').read_text())['workflows'],lanes=tuple((key,'legacy' if key=='main' else label) for key,label in LANES)))
 legacy_tests=dict(json.loads(json.dumps(tests)),tagged=None,executed=[],coverage=dict(source=None,value=None,languages={},attempts=[]))
 ops=dict(releases=dict(latest=None,count=0,items=[],tags=[],total_downloads=0,cadence_days=None,unreleased=None),branches=dict(default='main',protection=dict(enabled=True,required_reviews=1,required_checks=['E2E']),rulesets=[],items=[],count=1,stale=[]),public_advisories=[],community=dict(health_percentage=75,missing=['contributing'],files=dict(readme=True,contributing=False)),activity=dict(weeks=[dict(week=1789819200,total=10)],commits_4w=10,commits_52w=10),recent_commits=[],commits_7d=3,stale_automation=dict(workflow=None))
 wrap=lambda value:dict(status='ok',data=value,notes=[],error=None)
 doc.update(repo=repo,repo_url=base,config=dict(artifact_names=['ut-results','e2e-results','real-e2e-results'],pr_idle_days=14),sections={k:wrap(v) for k,v in dict(repo=dict(description='浏览器验收数据',stars=10,forks=2,language='Python',license='MIT',default_branch='main',pushed_at=time),issues=issues,prs=prs,ci=ci,tests=tests,ops=ops).items()})
-doc['lines']=configured_lines(json.loads((root/'board-config.json').read_text()),'main')
+doc['lines']=configured_lines(json.loads((root/'test/fixtures/board-config.json').read_text()),'main')
 doc['line_sections']={'legacy':dict(ci=wrap(legacy_ci),tests=wrap(legacy_tests)),
                       'release':dict(ci=wrap(swarm_ci),tests=wrap(swarm_tests))}
 doc['board']=BoardStore(cfg,persist=False).payload(doc)
