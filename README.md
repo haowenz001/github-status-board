@@ -1,8 +1,10 @@
 # GitHub 项目状态看板
 
-> **本仓是私仓/单仓看板模板。** 上游 `ScienceDiscovery/github-status-board` 的
+> **本仓是单仓看板模板。** 上游 `ScienceDiscovery/github-status-board` 的
 > OIDC/Bot 采集流程已移到 `docs/upstream-workflows/`，模板使用
 > `setup.yml` + `collect-selfhosted.yml`，只需要源仓链接和一份 JSON 配置。
+> 当前 Pages 上是 `haowenz001/ci-gates-smoke-20261022` 的 smoke 示例；第一次
+> **Setup dashboard** 会把它替换成你的源仓。
 
 ## 模板快速开始
 
@@ -23,6 +25,7 @@
    - `reset`：切换源仓时勾选，清掉旧采集数据。
 4. 源仓按 [`source-template/`](source-template/README.md) 复制门禁工作流、`.github/ci-gates.json`、`scripts/gate/gate.mjs` 和用例目录，改成自己的 build/lint/test 命令。
 5. Setup 会写入 `board-config.json` 并触发 `Collect dashboard data (PAT)`；采集完成后 `Deploy dashboard Pages` 自动发布。
+6. 源仓的 `CI` 运行上传 `ci-gates-reports` 后，看板 CI 页出现「质量门禁」卡片，显示每个 lane 的结论、命令通过数和用例 catalog 的 ready/todo/skipped 数量。
 
 模板默认面向**公开源仓 + 公开 Pages**：采集使用本仓 `GITHUB_TOKEN` 读取源仓并提交 `site/`。私有源仓不要用 Actions 发布到公开 Pages；请在本机运行：
 
