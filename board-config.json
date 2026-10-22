@@ -26,10 +26,10 @@
     }
   ],
   "deployments": {
-    "example/source": {
+    "haowenz001/ci-gates-smoke-20261022": {
       "environment": "production",
-      "label": "example",
-      "repository": "example/board"
+      "label": "smoke",
+      "repository": "haowenz001/github-status-board"
     }
   }
 }
