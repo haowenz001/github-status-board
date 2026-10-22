@@ -24,14 +24,14 @@
 4. 源仓按 [`source-template/`](source-template/README.md) 复制门禁工作流、`.github/ci-gates.json`、`scripts/gate/gate.mjs` 和用例目录，改成自己的 build/lint/test 命令。
 5. Setup 会写入 `board-config.json` 并触发 `Collect dashboard data (PAT)`；采集完成后 `Deploy dashboard Pages` 自动发布。
 
-源仓是公开仓时，采集使用本仓 `GITHUB_TOKEN` 即可。源仓是私有仓时，在本仓 **Settings → Secrets and variables → Actions** 添加 `SOURCE_TOKEN`（fine-grained PAT，至少 `Contents: read`、`Actions: read`、`Issues: read`、`Pull requests: read`、`Metadata: read`）。注意：公开 Pages 会展示源仓数据，私有源仓不要直接发布到公开 Pages；私有场景请用本机 `publish.py` + `server.py`：
+模板默认面向**公开源仓 + 公开 Pages**：采集使用本仓 `GITHUB_TOKEN` 读取源仓并提交 `site/`。私有源仓不要用 Actions 发布到公开 Pages；请在本机运行：
 
 ```bash
 GSB_ALLOW_PRIVATE=1 GITHUB_TOKEN=... python3 publish.py --repo owner/private-repo
 python3 server.py
 ```
 
-`GSB_ALLOW_PRIVATE=1` 只允许生成本机 `dist/`，`publish.py --publish-repo` 仍会拒绝私有源仓，避免误发到公开 Pages。
+`GSB_ALLOW_PRIVATE=1` 只允许生成本机 `dist/`，`publish.py --publish-repo` 仍会拒绝私有源仓，避免误发到公开 Pages。私有源仓要对外发布，需要私有 Pages、内网 runner 或额外的访问控制，这不是本模板默认提供的。
 
 `board-config.json` 仍然兼容上游配置格式；`docs/` 里的上游文档保留作参考。
 

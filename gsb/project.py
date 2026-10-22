@@ -9,6 +9,7 @@ import zipfile
 from urllib.parse import quote
 
 from .ci_lanes import build_lanes
+from .ci_gates import parse_artifact as parse_gate_artifact, summary as gate_summary
 from .tagged import TaggedStore
 from .collectors import Context, collect_issues, collect_prs
 from .config import Config
@@ -30,6 +31,7 @@ def channel(run, rules):
 
 
 COVERAGE_SUMMARY = re.compile(r"(node|python)-coverage-summary-")
+GATE_REPORT = re.compile(r"ci-gates-reports", re.I)
 REPORT_NAME = re.compile(r"results|junit|playwright|test.report|dashboard", re.I)
 RAW_COVERAGE = re.compile(r"coverage|lcov|codecov", re.I)
 
@@ -73,6 +75,16 @@ def run_details(gh, cfg, run, *, cache=None, parser_version=None):
     summarized = any(COVERAGE_SUMMARY.match(artifact["name"]) for artifact in artifacts)
     for artifact in artifacts:
         name = artifact["name"]
+        if GATE_REPORT.search(name):
+            if artifact.get("expired") or artifact.get("size_in_bytes", 0) > cfg.artifact_max_bytes:
+                continue
+            try:
+                parsed = parse_gate_artifact(gh.download_artifact(cfg.repo, artifact["id"], max_bytes=cfg.artifact_max_bytes))
+                if parsed:
+                    run["gates"] = parsed
+            except (GitHubError, ValueError):
+                pass
+            continue
         if not (REPORT_NAME.search(name) or RAW_COVERAGE.search(name)):
             continue
         # Coverage summaries hold no test reports; the coverage view reads them once through its store.
@@ -232,6 +244,7 @@ def build_project(gh, repo, settings=None):
         ci["lanes"] = build_lanes(runs, default_branch=meta["default_branch"], now=now, rules=rules,
                                   prs=[pr for key in ("items", "recent_merged", "recent_closed_unmerged") for pr in (doc["prs"] or {}).get(key, [])],
                                   collected_since=runs[-1]["created_at"] if len(runs) >= 100 else None)
+        ci["gates"] = gate_summary(runs)
     try:
         # The vocabulary only fills defaults; an unreadable copy must not hide Actions data.
         tagged.refresh_schema(gh.get_text_file, repo)

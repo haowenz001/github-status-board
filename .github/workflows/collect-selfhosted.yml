@@ -32,8 +32,7 @@ jobs:
         run: python3 collection_context.py
       - name: Collect source and publish snapshot
         env:
-          GITHUB_TOKEN: ${{ secrets.SOURCE_TOKEN || github.token }}
-          GSB_PUBLISH_TOKEN: ${{ secrets.BOARD_TOKEN || github.token }}
+          GITHUB_TOKEN: ${{ github.token }}
         run: |
           args=(--repo "${{ steps.context.outputs.source }}" --publish-repo "${{ github.repository }}")
           if [ -f .sync/state.json ]; then

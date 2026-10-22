@@ -6,6 +6,7 @@ from zoneinfo import ZoneInfo
 
 from .board import BoardStore
 from .ci_lanes import LANES, PR_EVENTS, build_lanes, window_start
+from .ci_gates import summary as gate_summary
 from .collectors import Context, collect_ci, summarize_issues, summarize_prs, days_between
 from .coverage_store import CoverageStore
 from .history import read_json, encode
@@ -292,6 +293,7 @@ def build_snapshot(sync):
                                   collected_since=None if progress["backfill"].get("runs", {}).get("complete")
                                   else min((row["created_at"] for row in index.values()), default=None))
         runs = [project_run(row) for row in history.select("runs", lambda r, key=key: run_line.get(r["id"]) == key and r["attempt"] == index[r["id"]]["attempt"], limit=100)]
+        ci["gates"] = gate_summary(runs)
         for run in runs:
             for report in run.get("tests", []):
                 report["cases"] = []  # old renderer contract; no testcase records
