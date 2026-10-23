@@ -6,6 +6,8 @@
 > 当前 Pages 上是 `haowenz001/ci-gates-smoke-20261022` 的 smoke 示例；第一次
 > **Setup dashboard** 会把它替换成你的源仓。
 
+> 给用户 AI 的自动化操作手册：[AGENT.md](AGENT.md)（门禁、Dashboard、用例三步走）。
+
 ## 模板快速开始
 
 1. 用本仓创建一个新的看板仓（建议 public，Pages 需要）。
