@@ -1,4 +1,4 @@
-> **已迁移**：本文件不再维护。请使用 [`agent-CI-Infra/ci-gates/AGENT.md`](https://github.com/agent-CI-Infra/ci-gates/blob/main/AGENT.md)（门禁）与 [`agent-CI-Infra/dashboard/AGENT.md`](https://github.com/agent-CI-Infra/dashboard/blob/main/AGENT.md)（Dashboard）。
+> **已迁移**：本文件不再维护。请使用 [`agent-CI-Infra/CI-workflow/AGENT.md`](https://github.com/agent-CI-Infra/CI-workflow/blob/main/AGENT.md)（门禁）与 [`agent-CI-Infra/dashboard/AGENT.md`](https://github.com/agent-CI-Infra/dashboard/blob/main/AGENT.md)（Dashboard）。
 
 # AGENT.md — ci-gates + 单仓 Dashboard 自动化
 
