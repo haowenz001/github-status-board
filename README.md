@@ -1,7 +1,7 @@
 # GitHub 项目状态看板
 
 > **已迁移**：本仓的代码与模板已并入 [`agent-CI-Infra/dashboard/single-repo`](https://github.com/agent-CI-Infra/dashboard/tree/main/single-repo)。
-> 本仓仅保留在线示例，不再作为新的模板仓维护；门禁模板见 [`agent-CI-Infra/ci-gates`](https://github.com/agent-CI-Infra/ci-gates)。
+> 本仓仅保留在线示例，不再作为新的模板仓维护；门禁模板见 [`agent-CI-Infra/CI-workflow`](https://github.com/agent-CI-Infra/CI-workflow)。
 
 > **本仓是单仓看板模板。** 上游 `ScienceDiscovery/github-status-board` 的
 > OIDC/Bot 采集流程已移到 `docs/upstream-workflows/`，模板使用
